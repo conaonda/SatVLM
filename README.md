@@ -1,6 +1,6 @@
 # 🛰️ Satellite VLM API
 
-**v0.1.1** | [CHANGELOG](CHANGELOG.md) | [LICENSE](LICENSE)
+**v0.1.2** | [CHANGELOG](CHANGELOG.md) | [LICENSE](LICENSE)
 
 위성영상 분석을 위한 로컬 REST API 서버
 **완전 에어갭(air-gap) 환경 지원** — 모델을 로컬에서 서빙, 인터넷 불필요
@@ -290,9 +290,31 @@ pytest tests/test_describe.py -v
 # CustomData 이미지 테스트 (tests/fixtures/CustomData/ 필요)
 pytest tests/test_custom_data.py -v -s
 
+# 38-Cloud 구름 커버리지 테스트 (mock)
+pytest tests/test_38cloud.py -v
+
 # UC Merced 데이터셋 테스트 (tests/fixtures/UCMerced_LandUse/ 필요)
 pytest tests/test_ucmerced_dataset.py -v -s
 ```
+
+### 실제 백엔드 테스트 (GPU 또는 CPU)
+
+모델을 다운로드한 후 mock 없이 실제 추론으로 테스트할 수 있습니다.
+
+```bash
+# 모델 다운로드 (최초 1회, 인터넷 필요)
+python scripts/download_model.py --model qwen2-vl-2b --output ./models
+
+# CustomData로 실제 백엔드 통합 테스트
+MODEL_BACKEND=qwen2_vl QWEN2_VL_LOCAL_PATH=./models/qwen2-vl-2b DEVICE=cpu \
+    python tests/test_real_backend.py
+
+# 38-Cloud 구름 커버리지 정확도 벤치마크
+MODEL_BACKEND=qwen2_vl QWEN2_VL_LOCAL_PATH=./models/qwen2-vl-2b DEVICE=cpu \
+    python tests/test_38cloud.py
+```
+
+> CPU 모드에서는 이미지당 30-60초 소요됩니다. GPU(`DEVICE=cuda`)를 사용하면 2-5초로 단축됩니다.
 
 ---
 

@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-03-13
+
+### Added
+- 38-Cloud 데이터셋(Landsat 8) 기반 구름 커버리지 벤치마크 테스트 (`tests/test_38cloud.py`)
+  - Ground truth 마스크 대비 모델 추정 정확도 비교 (clear/partial/cloudy 10개 패치)
+  - mock 테스트 24개 + 실제 백엔드 정확도 측정 스크립트
+- 실제 백엔드(Qwen2-VL) 통합 테스트 스크립트 (`tests/test_real_backend.py`)
+  - CPU/GPU 모두 지원, CustomData 이미지로 5개 엔드포인트 검증
+- 38-Cloud 샘플 fixture (`tests/fixtures/38-Cloud/`): 이미지 10개 + GT 마스크
+
+### Fixed
+- `model_manager.py`: torch 지연 로딩 전환 시 `import torch` 누락 4곳 수정
+  - `_load_qwen2_vl`, `_load_internvl2`, `_load_llava`, `_infer_qwen2_vl`
+  - 실제 백엔드 구동 시 `NameError: name 'torch' is not defined` 발생하던 버그
+
 ## [0.1.1] - 2026-03-13
 
 ### Added
