@@ -66,6 +66,7 @@ class ModelManager:
 
     async def _load_qwen2_vl(self, model_path: str):
         """Qwen2-VL 로드 (fine-tuning 후 권장 모델)"""
+        import torch
         from transformers import Qwen2VLForConditionalGeneration, AutoProcessor
 
         dtype = torch.float16 if settings.TORCH_DTYPE == "float16" else torch.bfloat16
@@ -81,6 +82,7 @@ class ModelManager:
 
     async def _load_internvl2(self, model_path: str):
         """InternVL2 로드"""
+        import torch
         from transformers import AutoModel, AutoTokenizer
         import torchvision.transforms as T
 
@@ -100,6 +102,7 @@ class ModelManager:
 
     async def _load_llava(self, model_path: str):
         """LLaVA-1.5 fallback 로드"""
+        import torch
         from transformers import LlavaForConditionalGeneration, AutoProcessor
 
         dtype = torch.float16 if settings.TORCH_DTYPE == "float16" else torch.float32
@@ -241,6 +244,7 @@ class ModelManager:
 
     def _infer_qwen2_vl(self, prompt: str, images: list, **kwargs) -> str:
         """Qwen2-VL 추론"""
+        import torch
         from qwen_vl_utils import process_vision_info
 
         messages = [
