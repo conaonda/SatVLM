@@ -25,3 +25,4 @@ tests/fixtures/*.jpg
 
 # 대용량 데이터셋
 tests/fixtures/UCMerced_LandUse/
+tests/fixtures/UCMerced_LandUse.zip
