@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "satvlm"
-version = "0.1.0"
+version = "0.1.1"
 description = "위성영상 분석을 위한 Vision-Language Model REST API"
 readme = "README.md"
 license = {text = "MIT"}

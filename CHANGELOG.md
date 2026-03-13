@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-03-13
+
+### Added
+- Mock 백엔드 (`MODEL_BACKEND=mock`): GPU/모델 없이 서버 구동 및 REST API 테스트 가능
+- `ModelBackend.MOCK` enum 및 `MODEL_NAME` 매핑 추가
+- 프롬프트 키워드 기반 현실적인 mock 응답 생성 (describe, compare, cloud, segment 등)
+
+### Changed
+- `model_manager.py`: `torch` import를 지연 로딩(lazy import)으로 변경 — mock 모드에서 torch 의존성 불필요
+
 ## [0.1.0] - 2026-03-13
 
 ### Added

@@ -1,6 +1,6 @@
 # 🛰️ Satellite VLM API
 
-**v0.1.0** | [CHANGELOG](CHANGELOG.md) | [LICENSE](LICENSE)
+**v0.1.1** | [CHANGELOG](CHANGELOG.md) | [LICENSE](LICENSE)
 
 위성영상 분석을 위한 로컬 REST API 서버
 **완전 에어갭(air-gap) 환경 지원** — 모델을 로컬에서 서빙, 인터넷 불필요
@@ -81,6 +81,21 @@ GEOCHAT_LOCAL_PATH=./models/geochat-7b
 DEVICE=cuda
 DEFAULT_LANGUAGE=ko
 ```
+
+### Mock 모드 (GPU 없이 실행)
+
+GPU나 모델 없이 서버를 구동하여 REST API를 테스트할 수 있습니다.
+
+```bash
+# .env에 mock 백엔드 설정
+echo "MODEL_BACKEND=mock" > .env
+
+# 서버 실행 (GPU/모델 다운로드 불필요)
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Mock 모드에서는 프롬프트 키워드 기반으로 현실적인 분석 응답을 생성합니다.
+모든 API 엔드포인트(`/describe`, `/compare`, `/cloud`, `/segment/*`)를 정상적으로 호출할 수 있습니다.
 
 ### 3단계: 서버 실행
 

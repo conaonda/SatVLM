@@ -12,6 +12,7 @@ class ModelBackend(str, Enum):
     QWEN2_VL = "qwen2_vl"        # 범용 고성능 VLM (fine-tuning 후보)
     INTERNVL2 = "internvl2"      # 고성능 오픈소스 VLM
     LLAVA = "llava"              # 범용 LLaVA (fallback)
+    MOCK = "mock"                # 개발/테스트용 mock 백엔드 (GPU 불필요)
 
 
 class Settings(BaseSettings):
@@ -65,6 +66,7 @@ class Settings(BaseSettings):
             ModelBackend.QWEN2_VL: "Qwen2-VL-7B-Instruct",
             ModelBackend.INTERNVL2: "InternVL2-8B",
             ModelBackend.LLAVA: "LLaVA-1.5-7B",
+            ModelBackend.MOCK: "Mock (Development)",
         }
         return mapping[self.MODEL_BACKEND]
 

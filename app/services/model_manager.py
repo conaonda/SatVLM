@@ -1,13 +1,11 @@
 """
 모델 매니저
-지원 백엔드: GeoChat, Qwen2-VL, InternVL2
+지원 백엔드: GeoChat, Qwen2-VL, InternVL2, Mock (개발용)
 에어갭 환경: 로컬 경로 우선, HuggingFace Hub 차선
 """
 
 import logging
 from typing import Optional
-
-import torch
 
 from config.settings import ModelBackend, settings
 
@@ -24,6 +22,12 @@ class ModelManager:
 
     async def load(self):
         """백엔드에 맞는 모델 로드"""
+        if self.backend == ModelBackend.MOCK:
+            logger.info("Mock 백엔드 활성화 (GPU/모델 불필요)")
+            self.is_loaded = True
+            return
+
+        import torch
         model_path = settings.ACTIVE_MODEL_PATH
         logger.info(f"모델 로딩: {model_path} (backend={self.backend})")
 
@@ -111,6 +115,11 @@ class ModelManager:
 
     async def unload(self):
         """메모리 해제"""
+        if self.backend == ModelBackend.MOCK:
+            self.is_loaded = False
+            logger.info("Mock 백엔드 종료")
+            return
+        import torch
         if self.model is not None:
             del self.model
             del self.processor
@@ -125,6 +134,8 @@ class ModelManager:
         통합 추론 인터페이스
         백엔드별로 올바른 추론 메서드 호출
         """
+        if self.backend == ModelBackend.MOCK:
+            return self._infer_mock(prompt, images, **kwargs)
         if self.backend in (ModelBackend.GEOCHAT, ModelBackend.LLAVA):
             return self._infer_llava_style(prompt, images, **kwargs)
         elif self.backend == ModelBackend.QWEN2_VL:
@@ -133,8 +144,75 @@ class ModelManager:
             return self._infer_internvl2(prompt, images, **kwargs)
         raise ValueError(f"지원하지 않는 백엔드: {self.backend}")
 
+    def _infer_mock(self, prompt: str, images: list, **kwargs) -> str:
+        """개발/테스트용 mock 추론 - 프롬프트 키워드 기반 응답 생성"""
+        p = prompt.lower()
+        if "change" in p and "detect" in p:
+            return (
+                "Change Detection Analysis:\n"
+                "Comparing the two time periods at the specified location:\n"
+                "- Before: Open agricultural field with sparse vegetation\n"
+                "- After: New residential development with 12-15 buildings\n"
+                "- Key changes: Land conversion from agricultural to urban use\n"
+                "- Change severity: High (complete land use transformation)"
+            )
+        if "detect" in p or "find all" in p:
+            return (
+                "Object Detection Results:\n"
+                "Total objects detected: 8 instances\n"
+                "- 3 objects located in the northern quadrant\n"
+                "- 2 objects in the central area near road intersection\n"
+                "- 3 objects in the southern region along the waterfront\n"
+                "Confidence: moderate to high"
+            )
+        if "segment" in p or "land cover" in p or "land use" in p:
+            return (
+                "Land cover classification results:\n"
+                "- Urban/Built-up: 35% (central and eastern portions)\n"
+                "- Forest/Vegetation: 28% (northwestern hills)\n"
+                "- Agricultural: 20% (southern plains)\n"
+                "- Water bodies: 10% (river running east-west)\n"
+                "- Bare soil/Exposed: 7% (construction sites)"
+            )
+        if "cloud" in p:
+            return (
+                "Cloud Analysis Results:\n"
+                "- Overall cloud coverage: 42.3%\n"
+                "- Cloud types: Cumulus (dominant), scattered cirrus\n"
+                "- Clear regions: Southern and eastern portions\n"
+                "- Shadow impact: 8% additional area affected\n"
+                "- Quality Score: 6/10\n"
+                "- Recommendation: Partially usable for analysis"
+            )
+        if "compare" in p:
+            return (
+                "Image Comparison Analysis:\n"
+                "- Spatial extent: Both images cover similar geographic area\n"
+                "- Notable differences: Vegetation density change in western sector\n"
+                "- Urban expansion visible in southeastern quadrant\n"
+                "- Water level variation detected in central reservoir"
+            )
+        if "point" in p or "pixel" in p or "location" in p:
+            return (
+                "Point Analysis:\n"
+                "The specified location shows a mixed urban-commercial area.\n"
+                "- Primary feature: Multi-story commercial building\n"
+                "- Surrounding context: Paved roads, parking areas\n"
+                "- Vegetation: Sparse street trees along the road"
+            )
+        # default: describe
+        return (
+            "This satellite image shows a dense urban area with a mix of "
+            "residential and commercial buildings. The area features a grid-like "
+            "road network with moderate vegetation coverage along main streets. "
+            "A river or waterway is visible in the eastern portion of the image. "
+            "The overall image quality is good with high spatial resolution, "
+            "suitable for detailed urban analysis and building detection tasks."
+        )
+
     def _infer_llava_style(self, prompt: str, images: list, **kwargs) -> str:
         """LLaVA / GeoChat 추론"""
+        import torch
         from llava.mm_utils import process_images, tokenizer_image_token
         from llava.constants import IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_TOKEN
 
@@ -206,6 +284,7 @@ class ModelManager:
 
     def _infer_internvl2(self, prompt: str, images: list, **kwargs) -> str:
         """InternVL2 추론"""
+        import torch
         import torchvision.transforms as T
         from torchvision.transforms.functional import InterpolationMode
 
