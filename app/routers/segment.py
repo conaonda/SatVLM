@@ -57,7 +57,11 @@ async def segment_image(
     img = resize_for_model(img)
 
     manager = request.app.state.model_manager
-    result = manager.infer(prompt=get_segmentation_prompt(), images=[img])
+    try:
+        result = manager.infer(prompt=get_segmentation_prompt(), images=[img])
+    except Exception as e:
+        logger.error(f"세그멘테이션 추론 실패: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"모델 추론 실패: {e}")
 
     return SegmentationResponse(
         segmentation=result,
@@ -124,7 +128,11 @@ async def describe_point(
     manager = request.app.state.model_manager
 
     # 전체 이미지 + 크롭 영역 동시 제공 (컨텍스트 + 디테일)
-    result = manager.infer(prompt=prompt, images=[marked, cropped])
+    try:
+        result = manager.infer(prompt=prompt, images=[marked, cropped])
+    except Exception as e:
+        logger.error(f"포인트 분석 추론 실패: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"모델 추론 실패: {e}")
 
     return PointDescriptionResponse(
         description=result,
@@ -179,7 +187,11 @@ async def describe_region(
     prompt = POINT_DESCRIPTION.format(lang=_lang_suffix())
 
     manager = request.app.state.model_manager
-    result = manager.infer(prompt=prompt, images=[marked, cropped])
+    try:
+        result = manager.infer(prompt=prompt, images=[marked, cropped])
+    except Exception as e:
+        logger.error(f"영역 분석 추론 실패: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"모델 추론 실패: {e}")
 
     return PointDescriptionResponse(
         description=result,
@@ -228,7 +240,11 @@ async def detect_objects(
 
     prompt = get_object_detection_prompt(target)
     manager = request.app.state.model_manager
-    result = manager.infer(prompt=prompt, images=[img])
+    try:
+        result = manager.infer(prompt=prompt, images=[img])
+    except Exception as e:
+        logger.error(f"객체 감지 추론 실패: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"모델 추론 실패: {e}")
 
     return ObjectDetectionResponse(
         detections=result,
@@ -290,7 +306,11 @@ async def detect_change_at_point(
     # [전체1, 크롭1, 전체2, 크롭2] 4장 전달
     prompt = get_change_point_prompt()
     manager = request.app.state.model_manager
-    result = manager.infer(prompt=prompt, images=images)
+    try:
+        result = manager.infer(prompt=prompt, images=images)
+    except Exception as e:
+        logger.error(f"변화 감지 추론 실패: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"모델 추론 실패: {e}")
 
     return PointDescriptionResponse(
         description=result,

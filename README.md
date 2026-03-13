@@ -1,6 +1,8 @@
 # 🛰️ Satellite VLM API
 
-위성영상 분석을 위한 로컬 REST API 서버  
+**v0.1.0** | [CHANGELOG](CHANGELOG.md) | [LICENSE](LICENSE)
+
+위성영상 분석을 위한 로컬 REST API 서버
 **완전 에어갭(air-gap) 환경 지원** — 모델을 로컬에서 서빙, 인터넷 불필요
 
 ---
@@ -255,6 +257,26 @@ MODEL_BACKEND=qwen2_vl
 QWEN2_VL_LOCAL_PATH=./models/satellite-vlm-finetuned
 
 # 5. 서버 재시작
+```
+
+---
+
+## 테스트
+
+GPU/모델 없이 mock 기반으로 전체 테스트를 실행할 수 있습니다.
+
+```bash
+# 전체 테스트 (mock 기반, GPU 불필요)
+pytest tests/ -v
+
+# 특정 테스트 파일
+pytest tests/test_describe.py -v
+
+# CustomData 이미지 테스트 (tests/fixtures/CustomData/ 필요)
+pytest tests/test_custom_data.py -v -s
+
+# UC Merced 데이터셋 테스트 (tests/fixtures/UCMerced_LandUse/ 필요)
+pytest tests/test_ucmerced_dataset.py -v -s
 ```
 
 ---

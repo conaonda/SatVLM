@@ -11,6 +11,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app import __version__
 from app.routers import describe, compare, cloud, segment
 from app.services.model_manager import ModelManager
 from config.settings import settings
@@ -40,7 +41,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Satellite VLM API",
     description="위성영상 분석을 위한 Vision-Language Model REST API",
-    version="1.0.0",
+    version=__version__,
     lifespan=lifespan,
 )
 

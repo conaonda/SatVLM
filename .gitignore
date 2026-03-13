@@ -22,3 +22,6 @@ logs/
 # 테스트 이미지
 tests/fixtures/*.tif
 tests/fixtures/*.jpg
+
+# 대용량 데이터셋
+tests/fixtures/UCMerced_LandUse/
